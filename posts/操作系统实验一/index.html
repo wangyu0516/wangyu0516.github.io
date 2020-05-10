@@ -144,7 +144,7 @@ typedef int __kernel_pid_t;
 
 <p>​    首先在<a href="https://www.kernel.org/">Linux官网</a>下载内核源代码，在这里可以找到所有的内核版本。我下载的是4.19.120版本的，个人感觉下载的内核版本最好要高于虚拟机内核版本，之前下载4.4.218版本，莫名其妙碰到好多坑，一换4.19.120立马就好了。</p>
 
-<p>​    由于我虚拟机下载贼慢，所以我是先在Windows上下载好后通过虚拟机共享文件夹传到虚拟机中(传过来的共享文件会在/mnt/hgfs目录下)。</p>
+<p>​    由于我虚拟机下载比较慢，所以我是先在Windows上下载好后通过虚拟机共享文件夹传到虚拟机中(传过来的共享文件会在/mnt/hgfs目录下)。</p>
 
 <p>进入虚拟机后，将传过来的压缩文件复制到/usr/src目录下，分两步解压缩：</p>
 
@@ -333,22 +333,30 @@ int main()
 	scanf(&quot;%d %d&quot;, &amp;flag1, &amp;nicevalue1);
 	printf(&quot;分别输入第二次的flag值和nicevalue值：&quot;);
 	scanf(&quot;%d %d&quot;, &amp;flag2, &amp;nicevalue2);
-	
+	printf(&quot;分别输入第三次的flag值和nicevalue值：&quot;);
+	scanf(&quot;%d %d&quot;, &amp;flag3, &amp;nicevalue3);
+
+
 	syscall(__NR_MYSETNICE, id, flag1, nicevalue1, &amp;prio, &amp;nice);
 	printf(&quot;第一次: prio:%d, nice:%d\n&quot;, prio, nice);
 
 	syscall(__NR_MYSETNICE, id, flag2, nicevalue2, &amp;prio, &amp;nice);
 	printf(&quot;第二次: prio:%d, nice:%d\n&quot;, prio, nice);
+
+	syscall(__NR_MYSETNICE, id, flag3, nicevalue3, &amp;prio, &amp;nice);
+	printf(&quot;第三次: prio:%d, nice:%d\n&quot;, prio, nice);
 	
 	return 0;
 }
 </code></pre>
 
-<p>运行结果如下：</p>
+<p>用户态程序输出如下：</p>
 
 <p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/prio_nice.jpg" alt="测试程序运行结果" /></p>
 
 <p>用户空间的进程初始化时默认是prio=20，nice=0，并且prio和nice有对应关系：prio = nice + 20。</p>
+
+<p>到了这一步，总算是大功告成了，不过仍然还有一些地方没太搞懂，以后有时间再看看(下次一定)。</p>
 
         </div>
 
