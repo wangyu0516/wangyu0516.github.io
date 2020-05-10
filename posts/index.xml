@@ -12,27 +12,15 @@
     
     
     <item>
-      <title>操作系统实验一</title>
+      <title>操作系统实验一：Linux内核编译及添加系统调用</title>
       <link>https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/</link>
       <pubDate>Sun, 10 May 2020 19:03:51 +0800</pubDate>
       
       <guid>https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/</guid>
-      <description>最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
-​ 作业内容要求如下：
+      <description>前段时间一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+作业内容要求如下：
  (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;pid：进程 ID。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;nicevalue：为指定进程设置的新 nice 值。 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
 (1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4).</description>
-    </item>
-    
-    <item>
-      <title>赤壁赋</title>
-      <link>https://wangyu0516.github.io/posts/cn/</link>
-      <pubDate>Wed, 29 Apr 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://wangyu0516.github.io/posts/cn/</guid>
-      <description>原文 壬戌之秋，七月既望，蘇子與客泛舟遊於赤壁之下。清風徐來，水波不興。舉酒屬客，誦明月之詩，歌窈窕之章。少焉，月出於東山之上，徘徊於斗牛之間。白露橫江，水光接天。縱一葦之所如，凌萬頃之茫然。浩浩乎如馮虛御風，而不知其所止；飄飄乎如遺世獨立,羽化而登仙。
-於是飲酒樂甚，扣舷而歌之。歌曰：“桂棹兮蘭槳，擊空明兮溯流光。渺渺兮予懷，望美人兮天一方。”客有吹洞簫者，倚歌而和之。其聲嗚嗚然，如怨如慕，如泣如訴；餘音嫋嫋，不絕如縷。舞幽壑之潛蛟，泣孤舟之嫠婦。
-蘇子愀然，正襟危坐，而問客曰：“何爲其然也？”客曰：“‘月明星稀，烏鵲南飛。’此非曹孟德之詩乎？西望夏口，東望武昌，山川相繆，鬱乎蒼蒼，此非孟德之困於周郎者乎？方其破荊州，下江陵，順流而東也，舳艫千里，旌旗蔽空，釃酒臨江，橫槊賦詩，固一世之雄也，而今安在哉？況吾與子漁樵於江渚之上，侶魚蝦而友麋鹿，駕一葉之扁舟，舉匏樽以相屬。寄蜉蝣於天地，渺滄海之一粟。哀吾生之須臾，羨長 江之無窮。挾飛仙以遨遊，抱明月而長終。知不可乎驟得，託遺響於悲風。”
-蘇子曰：“客亦知夫水與月乎？逝者如斯，而未嘗往也；盈虛者如彼，而卒莫消長也。蓋將自其變者而觀之，則天地曾不能以一瞬；自其不變者而觀之，則物與我皆無盡也，而又何羨乎！且夫天地之間，物各有主，苟非吾之所有，雖一毫而莫取。惟江上之清風，與山間之明月，耳得之而爲聲，目遇之而成色，取之無禁，用之不竭。是造物者之無盡藏也，而吾與子之所共適。”(共適 一作：共食) 客喜而笑，洗盞更酌。餚核既盡，杯盤狼籍。相與枕藉乎舟中，不知東方之既白。</description>
     </item>
     
   </channel>

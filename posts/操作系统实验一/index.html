@@ -19,9 +19,9 @@
            "@id": "https:\/\/wangyu0516.github.io\/"
       },
       "articleSection" : "posts",
-      "name" : "操作系统实验一",
-      "headline" : "操作系统实验一",
-      "description" : "最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。\n​ 作业内容要求如下：\n (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;pid：进程 ID。\x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;nicevalue：为指定进程设置的新 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：\n(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4).",
+      "name" : "操作系统实验一：Linux内核编译及添加系统调用",
+      "headline" : "操作系统实验一：Linux内核编译及添加系统调用",
+      "description" : "前段时间一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。\n作业内容要求如下：\n (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;pid：进程 ID。\x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;nicevalue：为指定进程设置的新 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：\n(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4).",
       "inLanguage" : "en-US",
       "author" : "",
       "creator" : "",
@@ -35,15 +35,15 @@
       "keywords" : [  ]
   }
 </script>
-<title>操作系统实验一 - Wangyu&#39;s Blog</title>
-  <meta property="og:title" content="操作系统实验一 - Wangyu&#39;s Blog" />
+<title>操作系统实验一：Linux内核编译及添加系统调用 - Wangyu&#39;s Blog</title>
+  <meta property="og:title" content="操作系统实验一：Linux内核编译及添加系统调用 - Wangyu&#39;s Blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
-​ 作业内容要求如下：
+  <meta property="og:description" content="前段时间一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+作业内容要求如下：
  (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
 (1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4)." />
-  <meta name="description" content="最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
-​ 作业内容要求如下：
+  <meta name="description" content="前段时间一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+作业内容要求如下：
  (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
 (1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4)." />
   <meta property="og:locale" content="en-us" />
@@ -81,7 +81,7 @@
 
         </div>
         <header class="post-header">
-          <h1 class="post-title">操作系统实验一</h1>
+          <h1 class="post-title">操作系统实验一：Linux内核编译及添加系统调用</h1>
           
           <div class="row post-desc">
             <div class="col-xs-6">
@@ -102,9 +102,9 @@
           
           
 
-<p>最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。</p>
+<p>前段时间一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。</p>
 
-<p>​    作业内容要求如下：</p>
+<p>作业内容要求如下：</p>
 
 <blockquote>
 <h5 id="1-添加一个系统调用-实现对指定进程的-nice-值的修改或读取功能-并返回进程最新的-nice-值及优先级-prio-br-建议调用原型为-br-int-mysetnice-pid-t-pid-int-flag-int-nicevalue-void-user-prio-void-user-nice-br-参数含义-br-nbsp-nbsp-nbsp-nbsp-pid-进程-id-br-nbsp-nbsp-nbsp-nbsp-flag-若值为-0-表示读取-nice-值-若值为-1-表示修改-nice-值-br-nbsp-nbsp-nbsp-nbsp-nicevalue-为指定进程设置的新-nice-值-br-nbsp-nbsp-nbsp-nbsp-prio-nice-指向进程当前优先级-prio-及-nice-值-br-返回值-系统调用成功时返回-0-失败时返回错误码-efault">(1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。<br/>建议调用原型为：<br/> int mysetnice(pid_t pid, int flag, int nicevalue,  void __user * prio, void __user * nice);<br/> 参数含义： <br/> &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。<br/>&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。<br/> &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 <br/>&nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。<br/>返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。</h5>
@@ -356,7 +356,7 @@ int main()
 
 <p>用户空间的进程初始化时默认是prio=20，nice=0，并且prio和nice有对应关系：prio = nice + 20。</p>
 
-<p>到了这一步，总算是大功告成了，不过仍然还有一些地方没太搞懂，以后有时间再看看(下次一定)。</p>
+<p>到了这一步，差不多算是大功告成了，不过仍然还有一些地方没太搞懂，以后有时间再看看(下次一定)。</p>
 
         </div>
 
