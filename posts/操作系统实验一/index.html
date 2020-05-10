@@ -178,13 +178,13 @@ typedef int __kernel_pid_t;
 
 <p>选择一个未使用的系统调用号进行分配，比如当前系统使用到 334 号，则新添加的系统调用可使用 335 号。确定调用号后，在 syscall_64.tbl 文件中为新调用添加一条记录，如图所示：</p>
 
-<p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/__x64_sys_mysetnice.jpg" alt="系统调用表" /></p>
+<p><img src="/images/__x64_sys_mysetnice.jpg" alt="系统调用表" /></p>
 
 <h4 id="2-申明系统调用服务例程原型">2.申明系统调用服务例程原型</h4>
 
 <p>查看Linux 系统调用服务例程的原型声明(include/linux/syscalls.h)，并在文件末尾添加相应原型声明，如图所示：</p>
 
-<p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/sys_mysetnice.jpg" alt="系统调用服务例程原型" /></p>
+<p><img src="/images/sys_mysetnice.jpg" alt="系统调用服务例程原型" /></p>
 
 <h4 id="3-实现系统调用服务例程">3.实现系统调用服务例程</h4>
 
@@ -302,13 +302,13 @@ typedef int __kernel_pid_t;
 
 <p>将GRUB_TIMEOUT_STYLE = HIDDEN注释，并将GRUB_TIMEOUT的值(也就是启动选择界面会出现多少秒)设置为一个较大的值，这里改为了10。</p>
 
-<p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/grub.jpg" alt="配置grub" /></p>
+<p><img src="/images/grub.jpg" alt="配置grub" /></p>
 
 <p>然后重启时就可以在启动界面选择需要启动的内核，启动完成后进入终端查看内核版本：</p>
 
 <h5 id="uname-a">#uname -a</h5>
 
-<p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/core.jpg" alt="内核版本" /></p>
+<p><img src="/images/core.jpg" alt="内核版本" /></p>
 
 <p><br/><br/></p>
 
@@ -352,7 +352,7 @@ int main()
 
 <p>用户态程序输出如下：</p>
 
-<p><img src="https://github.com/wangyu0516/wangyu0516.github.io/blob/master/images/prio_nice.jpg" alt="测试程序运行结果" /></p>
+<p><img src="/images/prio_nice.jpg" alt="测试程序运行结果" /></p>
 
 <p>用户空间的进程初始化时默认是prio=20，nice=0，并且prio和nice有对应关系：prio = nice + 20。</p>
 
