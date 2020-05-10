@@ -6,10 +6,22 @@
     <description>Recent content in Posts on Wangyu&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 29 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 19:03:51 +0800</lastBuildDate>
     
 	<atom:link href="https://wangyu0516.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>操作系统实验一</title>
+      <link>https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/</link>
+      <pubDate>Sun, 10 May 2020 19:03:51 +0800</pubDate>
+      
+      <guid>https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/</guid>
+      <description>最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+​ 作业内容要求如下：
+ (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;pid：进程 ID。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;nicevalue：为指定进程设置的新 nice 值。 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
+(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4).</description>
+    </item>
     
     <item>
       <title>赤壁赋</title>

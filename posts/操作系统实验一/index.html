@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.55.6" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="" />
+  <meta property="og:url" content="https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/" />
+  <link rel="canonical" href="https://wangyu0516.github.io/posts/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80/" /><link rel="alternate" type="application/atom+xml" href="https://wangyu0516.github.io/index.xml" title="Wangyu&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/wangyu0516.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "操作系统实验一",
+      "headline" : "操作系统实验一",
+      "description" : "最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。\n​ 作业内容要求如下：\n (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;pid：进程 ID。\x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;nicevalue：为指定进程设置的新 nice 值。 \x26nbsp;\x26nbsp;\x26nbsp;\x26nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：\n(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4).",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2020",
+      "datePublished": "2020-05-10 19:03:51 \x2b0800 CST",
+      "dateModified" : "2020-05-10 19:03:51 \x2b0800 CST",
+      "url" : "https:\/\/wangyu0516.github.io\/posts\/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E4%B8%80\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>操作系统实验一 - Wangyu&#39;s Blog</title>
+  <meta property="og:title" content="操作系统实验一 - Wangyu&#39;s Blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+​ 作业内容要求如下：
+ (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
+(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4)." />
+  <meta name="description" content="最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。
+​ 作业内容要求如下：
+ (1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。建议调用原型为： int mysetnice(pid_t pid, int flag, int nicevalue, void __user * prio, void __user * nice); 参数含义：  &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 &nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。 (2).写一个简单的应用程序测试 (1) 中添加的系统调用。 (3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。  首先要搞清楚这几个概念：
+(1).prio：prio值表示进程的优先级，进程prio值越小则优先级越高。 (2).nice：nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。 (3).pid_t： typedef __kernel_pid_t pid_t; typedef int __kernel_pid_t;  可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有： typedef int pid_t;  或： typedef long pid_t;  (4)." />
+  <meta property="og:locale" content="en-us" />
+
+  <link rel="stylesheet" href="/css/flexboxgrid-6.3.1.min.css" />
+  <link rel="stylesheet" href="/css/github-markdown.css" />
+  <link rel="stylesheet" href="/css/highlight/tomorrow.min.css" />
+  <link rel="stylesheet" href="/css/index.css">
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="Wangyu&#39;s Blog">
+  
+  <link href="https://fonts.googleapis.com/css?family=Arvo|Permanent+Marker|Bree+Serif" rel="stylesheet">
+  
+  
+
+  
+</head>
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="signatures site-title">
+    <a href="/">GojeonPa</a>
+  </div>
+</header>
+<div class="row end-xs">
+  
+  
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">操作系统实验一</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2020-05-10 19:03:51 CST">
+                10 May 2020
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          
+
+<p>最近一直在折腾操作系统实验一的作业，前前后后我花了两个多星期在这作业上，踩了不少坑。不过最后好歹是搞成功了，也算是有点收获，刚好在这里记录一下。</p>
+
+<p>​    作业内容要求如下：</p>
+
+<blockquote>
+<h5 id="1-添加一个系统调用-实现对指定进程的-nice-值的修改或读取功能-并返回进程最新的-nice-值及优先级-prio-br-建议调用原型为-br-int-mysetnice-pid-t-pid-int-flag-int-nicevalue-void-user-prio-void-user-nice-br-参数含义-br-nbsp-nbsp-nbsp-nbsp-pid-进程-id-br-nbsp-nbsp-nbsp-nbsp-flag-若值为-0-表示读取-nice-值-若值为-1-表示修改-nice-值-br-nbsp-nbsp-nbsp-nbsp-nicevalue-为指定进程设置的新-nice-值-br-nbsp-nbsp-nbsp-nbsp-prio-nice-指向进程当前优先级-prio-及-nice-值-br-返回值-系统调用成功时返回-0-失败时返回错误码-efault">(1).添加一个系统调用，实现对指定进程的 nice 值的修改或读取功能，并返回进程最新的 nice 值及优先级 prio。<br/>建议调用原型为：<br/> int mysetnice(pid_t pid, int flag, int nicevalue,  void __user * prio, void __user * nice);<br/> 参数含义： <br/> &nbsp;&nbsp;&nbsp;&nbsp;pid：进程 ID。<br/>&nbsp;&nbsp;&nbsp;&nbsp;flag：若值为 0，表示读取 nice 值；若值为 1，表示修改 nice 值。<br/> &nbsp;&nbsp;&nbsp;&nbsp;nicevalue：为指定进程设置的新 nice 值。 <br/>&nbsp;&nbsp;&nbsp;&nbsp;prio、nice：指向进程当前优先级 prio 及 nice 值。<br/>返回值：系统调用成功时返回 0，失败时返回错误码 EFAULT。</h5>
+
+<h5 id="2-写一个简单的应用程序测试-1-中添加的系统调用">(2).写一个简单的应用程序测试 (1) 中添加的系统调用。</h5>
+
+<h5 id="3-若程序中调用了-linux-的内核函数-要求深入阅读相关函数源码">(3).若程序中调用了 Linux 的内核函数，要求深入阅读相关函数源码。</h5>
+</blockquote>
+
+<p>首先要搞清楚这几个概念：</p>
+
+<h5 id="1-prio-br-prio值表示进程的优先级-进程prio值越小则优先级越高">(1).prio：<br/>prio值表示进程的优先级，进程prio值越小则优先级越高。</h5>
+
+<h5 id="2-nice-br-nice值表示进程优先级的修正数值-范围是从-20到19-正值表示调整到低优先级-负值表示调整到高优先级-值为零则表示不会调整该进程的优先级">(2).nice：<br/>nice值表示进程优先级的修正数值，范围是从-20到19。正值表示调整到低优先级，负值表示调整到高优先级，值为零则表示不会调整该进程的优先级。</h5>
+
+<h5 id="3-pid-t">(3).pid_t：</h5>
+
+<pre><code class="language-c">typedef __kernel_pid_t  pid_t;
+typedef int __kernel_pid_t;
+</code></pre>
+
+<h5 id="可以看出pid-t其实就是int类型-使用pid-t是为了可移植性好一些-因为在不同的平台上可能会有">可以看出pid_t其实就是int类型，使用pid_t是为了可移植性好一些，因为在不同的平台上可能会有：</h5>
+
+<pre><code class="language-c">typedef int pid_t;
+</code></pre>
+
+<h5 id="或">或：</h5>
+
+<pre><code class="language-c">typedef long pid_t;
+</code></pre>
+
+<h5 id="4-void-user-br-void-user-arg中的arg是一个用户空间的地址-而用户空间和内核空间之间不能简单地使用指针进行传递-故linux内核提供了多个函数和宏用于内核空间和用户空间传递数据-例如copy-from-user-copy-to-user-get-user-put-user等">(4).void __user*：<br/>(void __user*)arg中的arg是一个用户空间的地址，而用户空间和内核空间之间不能简单地使用指针进行传递，故linux内核提供了多个函数和宏用于内核空间和用户空间传递数据，例如copy_from_user，copy_to_user，get_user，put_user等。</h5>
+
+<p>大概了解完后就是正式开始了。</p>
+
+<h3 id="一-下载和解压缩内核源代码文件">一.下载和解压缩内核源代码文件</h3>
+
+<p>​    首先在<a href="https://www.kernel.org/">Linux官网</a>下载内核源代码，在这里可以找到所有的内核版本。我下载的是4.19.120版本的，个人感觉下载的内核版本最好要高于虚拟机内核版本，之前下载4.4.218版本，莫名其妙碰到好多坑，一换4.19.120立马就好了。</p>
+
+<p>​    由于我虚拟机下载贼慢，所以我是先在Windows上下载好后通过虚拟机共享文件夹传到虚拟机中(传过来的共享文件会在/mnt/hgfs目录下)。</p>
+
+<p>进入虚拟机后，将传过来的压缩文件复制到/usr/src目录下，分两步解压缩：</p>
+
+<h5 id="1-xz-d-linux-4-19-120-tar-xz">（1）xz -d linux-4.19.120.tar.xz</h5>
+
+<h5 id="2-tar-xvf-linux-4-19-120-tar">（2）tar –xvf linux-4.19.120.tar</h5>
+
+<p>注意：由于编译过程中会生成很多临时文件，所以要确保有足够的空闲空间，最好起码能有 20GB，我在建立虚拟机时预留了 40GB 磁盘空间(后来又扩展到60G&hellip;)。</p>
+
+<h3 id="二-清除残留的-config和-o文件">二.清除残留的.config和.o文件</h3>
+
+<p>每次开始完全重新编译之前，需要删除所有的编译生成文件(.o文件)、内核配置文件(.config文件)和各种备份文件。后续如果编译过程中出现错误，再次开始完全重新编译之前也需要如此清理。进入 linux-4.19.120 目录， 执行以下命令：</p>
+
+<h5 id="make-mrproper">#make mrproper</h5>
+
+<p>这里可能会提醒安装 ncurses 包，在 Ubuntu 中 ncurses 库的名字是 libncurses5-dev，所以安装命令是：</p>
+
+<h5 id="apt-get-install-libncurses5-dev">#apt-get install libncurses5-dev</h5>
+
+<p>安装完缺少的包之后再次执行命令：</p>
+
+<h5 id="make-mrproper-1">#make mrproper</h5>
+
+<p><br/><br/></p>
+
+<h3 id="三-添加系统调用">三.添加系统调用</h3>
+
+<h4 id="1-分配系统调用号-修改系统调用表">1. 分配系统调用号，修改系统调用表</h4>
+
+<p>查看系统调用表(arch/x86/entry/syscalls/syscall_64.tbl)，每个系统调用在表中占一表项，其格式为：  &lt;系统调用号&gt; <commom/64/x32> &lt;系统调用名&gt; &lt;服务例程入口地址&gt;</p>
+
+<p>选择一个未使用的系统调用号进行分配，比如当前系统使用到 334 号，则新添加的系统调用可使用 335 号。确定调用号后，在 syscall_64.tbl 文件中为新调用添加一条记录，如图所示：</p>
+
+<p><img src="https://github.com/forever-crazy/forever-crazy.github.io/blob/master/images/__x64_sys_mysetnice.jpg" alt="系统调用表" /></p>
+
+<h4 id="2-申明系统调用服务例程原型">2.申明系统调用服务例程原型</h4>
+
+<p>查看Linux 系统调用服务例程的原型声明(include/linux/syscalls.h)，并在文件末尾添加相应原型声明，如图所示：</p>
+
+<p><img src="https://github.com/forever-crazy/forever-crazy.github.io/blob/master/images/sys_mysetnice.jpg" alt="系统调用服务例程原型" /></p>
+
+<h4 id="3-实现系统调用服务例程">3.实现系统调用服务例程</h4>
+
+<p>为新调用mysetnice编写服务例程sys_mysetnice，添加在 sys.c 文件(kernel/sys.c)中，代码如下：</p>
+
+<pre><code class="language-c">SYSCALL_DEFINE5(mysetnice,  pid_t, pid, int, flag, int, nicevalue, void __user*, prio, void __user*, nice)
+{
+	struct pid *id;    	    //进程标识符结构体
+	struct task_struct *pcb;    //进程结构体
+
+	int new_nice, new_prio;
+
+	id = find_get_pid(pid);     //根据进程ID号获得进程标识符
+	pcb = pid_task(id, PIDTYPE_PID);  
+	//根据进程标识符获得指定进程，PIDTYPE_PID为进程类型的PID，除此之外还有线程，会话等类型的PID
+	
+	new_nice = task_nice(pcb);    //获得该进程的nice值
+	new_prio = task_prio(pcb);    //获得该进程的prio值
+
+	if(flag == 0)      //flag为0的情况
+	{
+		copy_to_user(nice, &amp;new_nice, sizeof(new_nice));
+		copy_to_user(prio, &amp;new_prio, sizeof(new_prio));
+		//将数据从内核空间拷贝到用户空间中	
+		return 0;
+	}
+	else if(flag == 1)       //flag为1的情况
+	{
+		set_user_nice(pcb, nicevalue);
+		//设置该进程的nice值为nicevalue
+		
+		new_nice = task_nice(pcb);
+		new_prio = task_prio(pcb);
+ 		//由于进程的nice值被修改了，故需要重新获取进程的nice值和prio值
+		
+		copy_to_user(nice, &amp;new_nice, sizeof(new_nice));
+		copy_to_user(prio, &amp;new_prio, sizeof(new_prio));
+		return 0;	
+	}
+	return EFAULT;
+}
+</code></pre>
+
+<p><br/><br/></p>
+
+<h3 id="四-配置和编译内核">四.配置和编译内核</h3>
+
+<p>执行命令：</p>
+
+<h5 id="make-menuconfig">#make menuconfig</h5>
+
+<p>运行该命令过程中，可能会出现错误信息：fatal error: curses.h: No such file or directory。</p>
+
+<p>执行命令安装套件 ncurses devel：</p>
+
+<h5 id="apt-get-install-libncurses5-dev-1">#apt-get install libncurses5-dev</h5>
+
+<p>在之后出现的对话框中选择 save 保存配置信息，文件名采用默认的.config，再选择 exit 退出。</p>
+
+<p>编译内核执行命令(可使用 make -j4 (4核CPU)或make -j2(2核CPU)来加快编译速度)：</p>
+
+<h5 id="make-j4">#make -j4</h5>
+
+<p>内核配置完成后，执行 make 命令开始编译内核，如果编译成功，则生成 Linux 启动映像文件 bzImage(位于./arch/x86_64/boot/bzImage中)。</p>
+
+<p>编译过程中，可能会出现一些错误，通常都是因为缺少某个库，一般根据相应的错误提示，安装相应的包即可，然后重新编译：</p>
+
+<h5 id="1-缺少-openssl">(1).缺少 openssl：</h5>
+
+<h5 id="apt-get-install-libssl-dev">#apt-get install libssl-dev</h5>
+
+<h5 id="2-缺少-bison">(2).缺少 bison：</h5>
+
+<h5 id="apt-get-install-bison">#apt-get install bison</h5>
+
+<h5 id="3-缺少-flex">(3).缺少 flex :</h5>
+
+<h5 id="apt-get-install-flex">#apt-get install flex</h5>
+
+<p>内核编译一般都需要挺长时间(我花了将近三个小时)，所以需要有耐心，可以在编译期间可以去做一些其他的事。</p>
+
+<p><br/><br/></p>
+
+<h3 id="五-编译模块和安装内核">五.编译模块和安装内核</h3>
+
+<p>依次执行以下命令：</p>
+
+<p>编译模块：</p>
+
+<h5 id="make-modules">#make modules</h5>
+
+<p>安装模块：</p>
+
+<h5 id="make-modules-install">#make modules_install</h5>
+
+<p>编译和安装模块也花了不少时间。</p>
+
+<p>再安装内核：</p>
+
+<h5 id="make-install">#make install</h5>
+
+<p>配置 grub 引导程序(该命令会自动修改 grub)：</p>
+
+<h5 id="update-grub2">#update-grub2</h5>
+
+<p><br/><br/></p>
+
+<h3 id="六-重启系统">六.重启系统</h3>
+
+<p>重启后系统就会自动启动新的内核(不过似乎是要安装的内核版本高于虚拟机的内核版本才会自动启动新的内核)，如果重启后内核还是之前的内核，可以采取以下操作：</p>
+
+<p>执行命令：</p>
+
+<h5 id="vim-etc-default-grub">#vim /etc/default/grub</h5>
+
+<p>将GRUB_TIMEOUT_STYLE = HIDDEN注释，并将GRUB_TIMEOUT的值(也就是启动选择界面会出现多少秒)设置为一个较大的值，这里改为了10。</p>
+
+<p><img src="https://github.com/forever-crazy/forever-crazy.github.io/blob/master/images/grub.jpg" alt="配置grub" /></p>
+
+<p>然后重启时就可以在启动界面选择需要启动的内核，启动完成后进入终端查看内核版本：</p>
+
+<h5 id="uname-a">#uname -a</h5>
+
+<p><img src="https://github.com/forever-crazy/forever-crazy.github.io/blob/master/images/core.jpg" alt="内核版本" /></p>
+
+<p><br/><br/></p>
+
+<h3 id="七-编写程序测试系统调用">七.编写程序测试系统调用</h3>
+
+<p>编写的程序代码如下：</p>
+
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;unistd.h&gt;
+#include&lt;sys/syscall.h&gt;
+#define __NR_MYSETNICE 335
+
+int main()
+{
+	int flag1, flag2, nicevalue1, nicevalue2;
+	int nice, prio;
+	pid_t id;
+
+	id = getpid();
+	
+	printf(&quot;分别输入第一次的flag值和nicevalue值：&quot;);
+	scanf(&quot;%d %d&quot;, &amp;flag1, &amp;nicevalue1);
+	printf(&quot;分别输入第二次的flag值和nicevalue值：&quot;);
+	scanf(&quot;%d %d&quot;, &amp;flag2, &amp;nicevalue2);
+	
+	syscall(__NR_MYSETNICE, id, flag1, nicevalue1, &amp;prio, &amp;nice);
+	printf(&quot;第一次: prio:%d, nice:%d\n&quot;, prio, nice);
+
+	syscall(__NR_MYSETNICE, id, flag2, nicevalue2, &amp;prio, &amp;nice);
+	printf(&quot;第二次: prio:%d, nice:%d\n&quot;, prio, nice);
+	
+	return 0;
+}
+</code></pre>
+
+<p>运行结果如下：</p>
+
+<p><img src="https://github.com/forever-crazy/forever-crazy.github.io/blob/master/images/grub.jpg" alt="测试程序运行结果" /></p>
+
+<p>用户空间的进程初始化时默认是prio=20，nice=0，并且prio和nice有对应关系：prio = nice + 20。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+
+        
+        
+
+        
+        
+        <div style="height: 50px;"></div>
+        
+        
+
+        <div class="site-footer">
+  
+  <div class="site-footer-item">
+    <a href="https://github.com/wangyu0516/" target="_blank">Github</a>
+  </div>
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  <script src="/js/highlight.pack.js"></script>
+
+
+<script>
+  hljs.initHighlightingOnLoad();
+  
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
